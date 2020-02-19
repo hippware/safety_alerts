@@ -1,0 +1,8 @@
+#!/bin/bash
+
+data_dir="./ugc_lookup_data"
+rev=${1}
+
+unzip "${rev}".zip -d ${data_dir}
+shp2pgsql -I ${data_dir}/"${rev}".shp ugc_lookup  > ugc_lookup.sql
+psql -d wocky_dev -f ugc_lookup.sql

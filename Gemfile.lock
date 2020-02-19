@@ -1,0 +1,21 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    gull (0.4.0)
+      httpclient
+      nokogiri (>= 1.6.8)
+    httpclient (2.8.3)
+    mini_portile2 (2.4.0)
+    nokogiri (1.10.8)
+      mini_portile2 (~> 2.4.0)
+    pg (1.2.2)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  gull
+  pg
+
+BUNDLED WITH
+   2.1.2
