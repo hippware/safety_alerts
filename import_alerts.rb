@@ -1,17 +1,56 @@
 require 'gull'
+require 'json'
 require 'pg'
 
+SOURCE = 'US_NWS'
+
+db_host = ENV['WOCKY_DB_HOST'] || 'localhost'
+db_name = ENV['WOCKY_DB_NAME'] || 'wocky_dev'
+db_user = ENV['WOCKY_DB_USER'] || 'postgres'
+
+def hashify(obj)
+  obj.instance_variables.each_with_object({}) do |var, hash|
+    hash[var.to_s.delete("@")] = obj.instance_variable_get(var)
+  end
+end
+
 begin
-  conn = PG.connect :dbname => 'wocky_dev', :user => 'postgres'
+  conn = PG.connect :host => db_host, :dbname => db_name, :user => db_user
 
   conn.prepare 'insert_alert', <<~SQL.strip
-  INSERT INTO nws_alerts (
-    id, alert_type, title, summary, effective_at, expires_at, published_at,
-    area, polygon, geocode_fips6, geocode_ugc, urgency, severity, certainty,
-    vtec, geometry
+  INSERT INTO safety_alerts (
+    id,
+    source,
+    source_id,
+    created_at,
+    updated_at,
+    expires_at,
+    title,
+    summary,
+    link,
+    geometry,
+    data
   ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16
-  );
+    uuid_generate_v4(),
+    '#{SOURCE}',
+    $1,
+    now(),
+    now(),
+    $2,
+    $3,
+    $4,
+    $5,
+    $6,
+    $7
+  ) ON CONFLICT (source, source_id) DO
+  UPDATE SET
+    updated_at=now(),
+    expires_at=$2,
+    title=$3,
+    summary=$4,
+    link=$5,
+    geometry=$6,
+    data=$7
   SQL
 
   Gull::Alert.fetch.each do |alert|
@@ -21,7 +60,7 @@ begin
       end
 
     rs = conn.exec <<~SQL.strip
-    SELECT ST_AsEWKT(ST_Union(ugc.geom)) as polygon
+    SELECT ST_Union(ugc.geom) as polygon
     FROM (
       SELECT geom
       FROM ugc_lookup
@@ -29,24 +68,22 @@ begin
     ) AS ugc;
     SQL
 
-    conn.exec_prepared 'insert_alert', [
-      alert.id,
-      alert.alert_type,
-      alert.title,
-      alert.summary,
-      alert.effective_at,
-      alert.expires_at,
-      alert.published_at,
-      alert.area,
-      alert.polygon,
-      alert.geocode.fips6,
-      alert.geocode.ugc,
-      alert.urgency,
-      alert.severity,
-      alert.certainty,
-      alert.vtec,
-      rs.getvalue(0, 0)
-    ]
+    geometry = rs.getvalue(0, 0)
+
+    if geometry
+      data = hashify(alert)
+      data['geocode'] = hashify(alert.geocode)
+
+      conn.exec_prepared 'insert_alert', [
+        alert.id,
+        alert.expires_at,
+        alert.title,
+        alert.summary,
+        alert.link,
+        geometry,
+        data.to_json
+      ]
+    end
   end
 rescue PG::Error => e
   puts e.message

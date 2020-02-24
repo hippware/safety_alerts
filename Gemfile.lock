@@ -1,19 +1,39 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    activemodel (6.0.2.1)
+      activesupport (= 6.0.2.1)
+    activerecord (6.0.2.1)
+      activemodel (= 6.0.2.1)
+      activesupport (= 6.0.2.1)
+    activesupport (6.0.2.1)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 0.7, < 2)
+      minitest (~> 5.1)
+      tzinfo (~> 1.1)
+      zeitwerk (~> 2.2)
+    concurrent-ruby (1.1.6)
     gull (0.4.0)
       httpclient
       nokogiri (>= 1.6.8)
     httpclient (2.8.3)
+    i18n (1.8.2)
+      concurrent-ruby (~> 1.0)
     mini_portile2 (2.4.0)
+    minitest (5.14.0)
     nokogiri (1.10.8)
       mini_portile2 (~> 2.4.0)
     pg (1.2.2)
+    thread_safe (0.3.6)
+    tzinfo (1.2.6)
+      thread_safe (~> 0.1)
+    zeitwerk (2.2.2)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  activerecord
   gull
   pg
 
