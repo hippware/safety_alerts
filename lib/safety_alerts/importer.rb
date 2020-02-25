@@ -5,7 +5,9 @@ module SafetyAlerts
 
       klass = self.const_get(importer.upcase)
 
-      klass.run
+      count = klass.run
+
+      puts "Imported #{count} alerts from '#{importer.upcase}'"
     end
   end
 end

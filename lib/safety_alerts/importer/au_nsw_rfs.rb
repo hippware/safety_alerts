@@ -23,6 +23,8 @@ module SafetyAlerts
               data: JSON.dump(RGeo::GeoJSON.encode(f))
             )
           end
+
+          collection.size
         end
       end
     end

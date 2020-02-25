@@ -6,7 +6,9 @@ module SafetyAlerts
     module US_NWS
       def self.run
         AlertDB.with_connection('US_NWS') do |db|
-          Gull::Alert.fetch.each do |alert|
+          alerts = Gull::Alert.fetch
+
+          alerts.each do |alert|
             ugcs =
               alert.geocode.ugc.split(" ").map do |code|
                 code.sub(/([A-Z][A-Z])[CZ]([0-9]*)/, '\1\2')
@@ -36,6 +38,8 @@ module SafetyAlerts
               )
             end
           end
+
+          alerts.size
         end
       end
     end
