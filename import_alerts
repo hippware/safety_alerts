@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby -I lib
+
+require 'safety_alerts'
+
+SafetyAlerts.run_import(ARGV[0])
