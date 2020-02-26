@@ -5,7 +5,7 @@ module SafetyAlerts
   module Importer
     module US_NWS
       def self.run
-        AlertDB.with_connection('US_NWS') do |db|
+        AlertDB.run_imports_for('US_NWS') do |db|
           alerts = Gull::Alert.fetch
 
           alerts.each do |alert|

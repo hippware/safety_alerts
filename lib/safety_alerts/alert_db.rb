@@ -3,10 +3,16 @@ require 'pg'
 module SafetyAlerts
   class AlertDB
     class << self
-      def with_connection(source, &block)
+      def run_imports_for(source, &block)
         db = AlertDB.new(source)
 
-        block.call(db)
+        db.prepare_import
+
+        count = block.call(db)
+
+        db.delete_stale
+
+        count
       rescue PG::Error => e
         puts e.message
       ensure
@@ -29,6 +35,17 @@ module SafetyAlerts
         :password => @db_pass
       )
 
+      @conn.prepare 'reset_imported', <<~SQL
+      UPDATE safety_alerts SET imported = false
+        WHERE source = '#{@source}'
+      SQL
+
+      @conn.prepare 'delete_stale', <<~SQL
+      DELETE FROM safety_alerts
+      WHERE source = '#{@source}'
+        AND imported = false
+      SQL
+
       @conn.prepare 'insert_alert', <<~SQL.strip
       INSERT INTO safety_alerts (
         id,
@@ -41,7 +58,8 @@ module SafetyAlerts
         summary,
         link,
         geometry,
-        data
+        data,
+        imported
       ) VALUES (
         uuid_generate_v4(),
         '#{@source}',
@@ -53,7 +71,8 @@ module SafetyAlerts
         $4,
         $5,
         $6,
-        $7
+        $7,
+        true
       ) ON CONFLICT (source, source_id) DO
       UPDATE SET
         updated_at=now(),
@@ -62,7 +81,8 @@ module SafetyAlerts
         summary=$4,
         link=$5,
         geometry=$6,
-        data=$7
+        data=$7,
+        imported=true
       SQL
     end
 
@@ -85,6 +105,14 @@ module SafetyAlerts
         geometry,
         data
       ]
+    end
+
+    def prepare_import
+      @conn.exec_prepared 'reset_imported'
+    end
+
+    def delete_stale
+      @conn.exec_prepared 'delete_stale'
     end
   end
 end
