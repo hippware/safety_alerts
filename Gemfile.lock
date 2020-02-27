@@ -1,6 +1,9 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    aws-eventstream (1.0.3)
+    aws-sigv4 (1.1.1)
+      aws-eventstream (~> 1.0, >= 1.0.2)
     gull (0.4.0)
       httpclient
       nokogiri (>= 1.6.8)
@@ -12,6 +15,8 @@ GEM
     rgeo (2.1.1)
     rgeo-geojson (2.1.1)
       rgeo (>= 1.0.0)
+    vault (0.13.0)
+      aws-sigv4
 
 PLATFORMS
   ruby
@@ -21,6 +26,7 @@ DEPENDENCIES
   pg
   rgeo
   rgeo-geojson
+  vault
 
 BUNDLED WITH
    2.1.2

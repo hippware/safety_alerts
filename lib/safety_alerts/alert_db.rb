@@ -20,19 +20,18 @@ module SafetyAlerts
       end
     end
 
+    attr_reader :source
+
     def initialize(source)
       @source = source
 
-      @db_host = ENV['WOCKY_DB_HOST'] || 'localhost'
-      @db_name = ENV['WOCKY_DB_NAME'] || 'wocky_dev'
-      @db_user = ENV['WOCKY_DB_USER'] || 'postgres'
-      @db_pass = ENV['WOCKY_DB_PASSWORD'] || ''
+      secrets = Secrets.new
 
       @conn = PG.connect(
-        :host => @db_host,
-        :dbname => @db_name,
-        :user => @db_user,
-        :password => @db_pass
+        :host     => ENV['WOCKY_DB_HOST'] || 'localhost',
+        :dbname   => ENV['WOCKY_DB_NAME'] || 'wocky_dev',
+        :user     => ENV['WOCKY_DB_USER'] || 'postgres',
+        :password => secrets.get_value('db-password')
       )
 
       @conn.prepare 'reset_imported', <<~SQL
