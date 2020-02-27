@@ -20,7 +20,7 @@ module SafetyAlerts
     end
 
     def get_value(key)
-      @client&.logical.read("#{@prefix}/#{key}") || ''
+      @client&.read("#{@prefix}/#{key}") || ''
     end
   end
 end
