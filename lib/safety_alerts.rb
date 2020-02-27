@@ -1,3 +1,5 @@
+require 'honeybadger'
+
 require 'safety_alerts/alert_db'
 require 'safety_alerts/importer'
 require 'safety_alerts/secrets'

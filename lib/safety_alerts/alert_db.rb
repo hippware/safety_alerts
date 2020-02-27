@@ -14,7 +14,7 @@ module SafetyAlerts
 
         count
       rescue PG::Error => e
-        puts e.message
+        Honeybadger.notify(e)
       ensure
         db&.close
       end
