@@ -1,13 +1,21 @@
 module SafetyAlerts
   module GeometryImporter
     def self.run(importer)
-      require "safety_alerts/geometry_importer/#{importer.downcase}"
+      source = importer.upcase
 
+      require "safety_alerts/geometry_importer/#{source.downcase}"
       klass = self.const_get(importer.upcase)
+      db = DB.new(source)
 
-      count = klass.run
+      db.prepare_geometry_import
 
-      puts "Imported #{count} geometries from '#{importer.upcase}'"
+      count = klass.run(db)
+
+      puts "Imported #{count} geometries from '#{source}'"
+    rescue => error
+      Honeybadger.notify(error)
+    ensure
+      db&.close
     end
   end
 end

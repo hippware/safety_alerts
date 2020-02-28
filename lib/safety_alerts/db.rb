@@ -25,6 +25,75 @@ module SafetyAlerts
       rs = @conn.exec(sql)
       rs.getvalue(0, 0)
     end
+
+    def prepare_alert_import
+      @conn.prepare 'insert_alert', <<~SQL.strip
+      INSERT INTO safety_alerts (
+        id, source, source_id, created_at, updated_at, expires_at, title,
+        summary, link, geometry, data, imported
+      )
+      VALUES (
+        uuid_generate_v4(), '#{@source}', $1, now(), now(), $2, $3,
+        $4, $5, $6, $7, true
+      )
+      ON CONFLICT (source, source_id) DO UPDATE
+        SET updated_at=now(),
+            expires_at=$2,
+            title=$3,
+            summary=$4,
+            link=$5,
+            geometry=$6,
+            data=$7,
+            imported=true
+      SQL
+
+      @conn.exec <<~SQL
+      UPDATE safety_alerts SET imported = false
+        WHERE source = '#{@source}'
+      SQL
+    end
+
+    def insert_alert(id:, expires_at:, title:, summary:, link:, geometry:, data:)
+      @conn.exec_prepared 'insert_alert', [
+        id,
+        expires_at,
+        title,
+        summary,
+        link,
+        geometry,
+        data
+      ]
+    end
+
+    def delete_stale_alerts
+      @conn.exec <<~SQL
+      DELETE FROM safety_alerts
+      WHERE source = '#{@source}'
+        AND imported = false
+      SQL
+    end
+
+    def prepare_geometry_import
+      @conn.prepare 'insert_geometry', <<~SQL.strip
+      INSERT INTO safety_alerts_geometries (
+        source, source_id, created_at, updated_at, geometry, data
+      )
+      VALUES (
+        '#{source}', $1, now(), now(), $2, $3
+      )
+      ON CONFLICT (source, source_id) DO UPDATE
+        SET updated_at=now(),
+            geometry=$2,
+            data=$3
+      SQL
+    end
+
+    def insert_geometry(id:, geometry:, data:)
+      @conn.exec_prepared 'insert_geometry', [
+        id,
+        geometry,
+        data
+      ]
+    end
   end
 end
-

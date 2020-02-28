@@ -2,4 +2,4 @@
 
 require 'safety_alerts'
 
-SafetyAlerts.run_import(ARGV[0])
+SafetyAlerts.run_alert_import(ARGV[0])

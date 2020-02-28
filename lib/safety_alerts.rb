@@ -1,19 +1,17 @@
 require 'honeybadger'
 
 require 'safety_alerts/db'
-require 'safety_alerts/alert_db'
-require 'safety_alerts/alert_geometry_db'
+require 'safety_alerts/alert_importer'
 require 'safety_alerts/geometry_importer'
-require 'safety_alerts/importer'
 require 'safety_alerts/secrets'
 require 'safety_alerts/utils'
 
 module SafetyAlerts
-  def self.run_import(importer)
-    SafetyAlerts::Importer.run(importer)
+  def self.run_alert_import(importer)
+    AlertImporter.run(importer)
   end
 
   def self.run_geometry_import(importer)
-    SafetyAlerts::GeometryImporter.run(importer)
+    GeometryImporter.run(importer)
   end
 end
