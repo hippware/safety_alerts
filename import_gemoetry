@@ -1,0 +1,5 @@
+#!/usr/bin/env -S ruby -I lib
+
+require 'safety_alerts'
+
+SafetyAlerts.run_geometry_import(ARGV[0])

@@ -7,30 +7,15 @@ require 'rgeo/shapefile'
 module SafetyAlerts
   module Importer
     module AU_BOM
-      def self.load_shapes
-        shapes = Hash.new
-        shape_files = Dir['lib/safety_alerts/importer/au_bom_spatial/*.shp']
-        shape_files.each do |f|
-          RGeo::Shapefile::Reader.open(f) do |file|
-            file.each do |record|
-              if record.attributes["AAC"] then
-                shapes[record.attributes["AAC"]] =
-                  RGeo::GeoJSON.encode(record.geometry).to_json
-              end
-            end
-          end
-        end
-
-        shapes
-      end
-
       def self.run
-        shapes = load_shapes()
-
+        count = 0
         AlertDB.with_connection('AU_BOM') do |db|
-          count = 0
+          db.conn.prepare 'get_geometry', <<~SQL.strip
+                    SELECT geometry FROM safety_alerts_geometries
+                    WHERE source = 'AU_BOM' AND source_id = $1
+          SQL
 
-          # GRab all the amoc.xml files from the forecasts/warnings/observations
+          # Grab all the amoc.xml files from the forecasts/warnings/observations
           # directory
           ftp = Net::FTP.new('ftp.bom.gov.au')
           ftp.login
@@ -45,7 +30,7 @@ module SafetyAlerts
             # with a single "weather event" or similar
             if product_type.to_s == 'W' then
               expiry = doc.xpath('/amoc/expiry-time/text()')
-              root_id = doc.xpath('amoc/incident-id/text()')
+              root_id = doc.xpath('/amoc/identifier/text()')
 
               # Each warning can contain multiple "hazards" - eg
               # multiple different warning levels for a storm
@@ -55,31 +40,44 @@ module SafetyAlerts
                 title = h.xpath('./headline/text()')
                 index = h.xpath('@index')
                 id = root_id.to_s + '-' + index.to_s
+                puts id
 
                 # Each hazard can cover multiple areas
-                areas = h.xpath('./area-list')
+                areas = h.xpath('./area-list/area')
+                geometry = nil
+                description = []
                 areas.each do |a|
-                  if a.xpath('./area/@aac') then
-                    puts a.xpath('./area/@aac').to_s
-                    db.insert_alert(
-                      id: id,
-                      expires_at: expiry,
-                      title: title,
-                      summary: a.xpath('./area/@description').to_s,
-                      link: nil,
-                      geometry: shapes[a.xpath('./area/@aac').to_s],
-                      data: nil
-                    )
-                    ++count
+                  aac = a.xpath('@aac').to_s
+                  if aac then
+                    g = db.conn.exec_prepared('get_geometry', [aac]).getvalue(0, 0)
+                    if geometry then
+                      geometry += g
+                    else
+                      geometry = g
+                    end
                   end
+                  description.push(a.xpath('@description').to_s)
+                end
+
+                if geometry then
+                  db.insert_alert(
+                    id: id,
+                    expires_at: expiry,
+                    title: title,
+                    summary: description.join('; '),
+                    link: nil,
+                    geometry: geometry,
+                    data: '{}'
+                  )
+                  count += 1
                 end
               end
             end
-
-            count
           end
         end
       end
+
+      count
     end
   end
 end
