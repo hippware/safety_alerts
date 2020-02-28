@@ -22,8 +22,7 @@ module SafetyAlerts
     end
 
     def get_one(sql)
-      rs = @conn.exec(sql)
-      rs.getvalue(0, 0)
+      @conn.exec(sql).getvalue(0, 0)
     end
 
     def prepare_alert_import
@@ -47,9 +46,30 @@ module SafetyAlerts
             imported=true
       SQL
 
+      @conn.prepare 'get_geometry', <<~SQL.strip
+        SELECT geometry FROM safety_alerts_geometries
+        WHERE source = '#{@source}' AND source_id = $1
+      SQL
+
       @conn.exec <<~SQL
       UPDATE safety_alerts SET imported = false
         WHERE source = '#{@source}'
+      SQL
+    end
+
+    def get_geometry(id)
+      @conn.exec_prepared('get_geometry', [id]).getvalue(0, 0)
+    end
+
+    def get_geometry_union(ids)
+      get_one <<~SQL.strip
+        SELECT ST_Union(ugc.geometry) as polygon
+        FROM (
+          SELECT geometry
+          FROM safety_alerts_geometries
+          WHERE source = '#{@source}'
+            AND source_id IN (#{ids.map {|id| "'#{id}'"}.join(',')})
+        ) AS ugc;
       SQL
     end
 

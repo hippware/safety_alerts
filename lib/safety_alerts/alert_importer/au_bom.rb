@@ -9,11 +9,6 @@ module SafetyAlerts
     def self.run(db)
       count = 0
 
-      db.conn.prepare 'get_geometry', <<~SQL.strip
-        SELECT geometry FROM safety_alerts_geometries
-        WHERE source = 'AU_BOM' AND source_id = $1
-      SQL
-
       # Grab all the amoc.xml files from the forecasts/warnings/observations
       # directory
       ftp = Net::FTP.new('ftp.bom.gov.au')
@@ -48,7 +43,7 @@ module SafetyAlerts
             areas.each do |a|
               aac = a.xpath('@aac').to_s
               if aac then
-                g = db.conn.exec_prepared('get_geometry', [aac]).getvalue(0, 0)
+                g = db.get_geometry(aac)
                 if geometry then
                   geometry += g
                 else
