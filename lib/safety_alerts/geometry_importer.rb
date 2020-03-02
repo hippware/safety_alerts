@@ -13,6 +13,8 @@ module SafetyAlerts
 
       puts "Imported #{count} geometries from '#{source}'"
     rescue => error
+      puts error
+
       Honeybadger.notify(error)
     ensure
       db&.close

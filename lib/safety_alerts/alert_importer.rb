@@ -15,6 +15,8 @@ module SafetyAlerts
 
       puts "Imported #{count} alerts from '#{source}'"
     rescue => error
+      puts error
+
       Honeybadger.notify(error)
     ensure
       db&.close
