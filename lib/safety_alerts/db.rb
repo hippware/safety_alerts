@@ -99,7 +99,7 @@ module SafetyAlerts
         source, source_id, created_at, updated_at, geometry, data
       )
       VALUES (
-        '#{source}', $1, now(), now(), $2, $3
+        '#{@source}', $1, now(), now(), $2, $3
       )
       ON CONFLICT (source, source_id) DO UPDATE
         SET updated_at=now(),
