@@ -4,24 +4,18 @@ require 'json'
 module SafetyAlerts
   module AlertImporter::US_NWS
     def self.run(db)
-      alerts = Gull::Alert.fetch
+      count = 0
 
-      alerts.each do |alert|
+      Gull::Alert.fetch.each do |alert|
         ugcs =
           alert.geocode.ugc.split(" ").map do |code|
             code.sub(/([A-Z][A-Z])[CZ]([0-9]*)/, '\1\2')
           end
 
-        geometry = db.get_one <<~SQL.strip
-        SELECT ST_Union(ugc.geom) as polygon
-        FROM (
-          SELECT geom
-          FROM ugc_lookup
-          WHERE state_zone IN (#{ugcs.map {|id| "'#{id}'"}.join(',')})
-        ) AS ugc;
-        SQL
+        geometry = db.get_geometry_union(ugcs)
 
         if geometry
+          count += 1
           data = Utils.hashify(alert)
           data['geocode'] = Utils.hashify(alert.geocode)
 
@@ -37,7 +31,7 @@ module SafetyAlerts
         end
       end
 
-      alerts.size
+      count
     end
   end
 end
