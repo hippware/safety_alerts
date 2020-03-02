@@ -34,7 +34,6 @@ module SafetyAlerts
             title = h.xpath('./headline/text()')
             index = h.xpath('@index')
             id = root_id.to_s + '-' + index.to_s
-            puts id
 
             # Each hazard can cover multiple areas
             areas = h.xpath('./area-list/area')
