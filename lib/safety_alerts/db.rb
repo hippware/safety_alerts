@@ -29,23 +29,23 @@ module SafetyAlerts
 
     def prepare_alert_import
       @conn.prepare 'insert_alert', <<~SQL.strip
-      INSERT INTO safety_alerts (
-        id, source, source_id, created_at, updated_at, expires_at, title,
-        summary, link, geometry, data, imported
-      )
-      VALUES (
-        uuid_generate_v4(), '#{@source}', $1, now(), now(), $2, $3,
-        $4, $5, $6, $7, true
-      )
-      ON CONFLICT (source, source_id) DO UPDATE
-        SET updated_at=now(),
-            expires_at=$2,
-            title=$3,
-            summary=$4,
-            link=$5,
-            geometry=$6,
-            data=$7,
-            imported=true
+        INSERT INTO safety_alerts (
+          id, source, source_id, created_at, updated_at, expires_at, title,
+          summary, link, geometry, data, imported
+        )
+        VALUES (
+          uuid_generate_v4(), '#{@source}', $1, now(), now(), $2, $3,
+          $4, $5, $6, $7, true
+        )
+        ON CONFLICT (source, source_id) DO UPDATE
+          SET updated_at=now(),
+              expires_at=$2,
+              title=$3,
+              summary=$4,
+              link=$5,
+              geometry=$6,
+              data=$7,
+              imported=true
       SQL
 
       @conn.prepare 'get_geometry', <<~SQL.strip
@@ -54,7 +54,7 @@ module SafetyAlerts
       SQL
 
       @conn.exec <<~SQL
-      UPDATE safety_alerts SET imported = false
+        UPDATE safety_alerts SET imported = false
         WHERE source = '#{@source}'
       SQL
     end
@@ -70,7 +70,7 @@ module SafetyAlerts
           SELECT geometry
           FROM safety_alerts_geometries
           WHERE source = '#{@source}'
-            AND source_id IN (#{ids.map {|id| "'#{id}'"}.join(',')})
+            AND source_id IN (#{ids.map { |id| "'#{id}'" }.join(',')})
         ) AS ugc;
       SQL
     end
@@ -89,24 +89,24 @@ module SafetyAlerts
 
     def delete_stale_alerts
       @conn.exec <<~SQL
-      DELETE FROM safety_alerts
-      WHERE source = '#{@source}'
-        AND imported = false
+        DELETE FROM safety_alerts
+        WHERE source = '#{@source}'
+          AND imported = false
       SQL
     end
 
     def prepare_geometry_import
       @conn.prepare 'insert_geometry', <<~SQL.strip
-      INSERT INTO safety_alerts_geometries (
-        source, source_id, created_at, updated_at, geometry, data
-      )
-      VALUES (
-        '#{@source}', $1, now(), now(), $2, $3
-      )
-      ON CONFLICT (source, source_id) DO UPDATE
-        SET updated_at=now(),
-            geometry=$2,
-            data=$3
+        INSERT INTO safety_alerts_geometries (
+          source, source_id, created_at, updated_at, geometry, data
+        )
+        VALUES (
+          '#{@source}', $1, now(), now(), $2, $3
+        )
+        ON CONFLICT (source, source_id) DO UPDATE
+          SET updated_at=now(),
+              geometry=$2,
+              data=$3
       SQL
     end
 
