@@ -6,4 +6,5 @@ gem 'pg'
 gem 'rgeo'
 gem 'rgeo-geojson'
 gem 'rgeo-shapefile'
+gem 'rubocop', require: false
 gem 'vault'

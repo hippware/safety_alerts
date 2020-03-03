@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    ast (2.4.0)
     aws-eventstream (1.0.3)
     aws-sigv4 (1.1.1)
       aws-eventstream (~> 1.0, >= 1.0.2)
@@ -10,16 +11,32 @@ GEM
       nokogiri (>= 1.6.8)
     honeybadger (4.5.6)
     httpclient (2.8.3)
+    jaro_winkler (1.5.4)
     mini_portile2 (2.4.0)
     nokogiri (1.10.8)
       mini_portile2 (~> 2.4.0)
+    parallel (1.19.1)
+    parser (2.7.0.4)
+      ast (~> 2.4.0)
     pg (1.2.2)
+    rainbow (3.0.0)
+    rexml (3.2.4)
     rgeo (2.1.1)
     rgeo-geojson (2.1.1)
       rgeo (>= 1.0.0)
     rgeo-shapefile (2.0.1)
       dbf (~> 3.0)
       rgeo (>= 1.0)
+    rubocop (0.80.1)
+      jaro_winkler (~> 1.5.1)
+      parallel (~> 1.10)
+      parser (>= 2.7.0.1)
+      rainbow (>= 2.2.2, < 4.0)
+      rexml
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 1.4.0, < 1.7)
+    ruby-progressbar (1.10.1)
+    unicode-display_width (1.6.1)
     vault (0.13.0)
       aws-sigv4
 
@@ -33,6 +50,7 @@ DEPENDENCIES
   rgeo
   rgeo-geojson
   rgeo-shapefile
+  rubocop
   vault
 
 BUNDLED WITH
