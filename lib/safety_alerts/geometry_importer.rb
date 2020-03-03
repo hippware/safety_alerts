@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SafetyAlerts
   module GeometryImporter
     def self.run(importer)

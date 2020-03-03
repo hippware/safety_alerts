@@ -1,4 +1,5 @@
 #!/usr/bin/env -S ruby -I lib
+# frozen_string_literal: true
 
 require 'safety_alerts'
 

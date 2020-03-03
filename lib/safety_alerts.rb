@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'honeybadger'
 
 require 'safety_alerts/db'

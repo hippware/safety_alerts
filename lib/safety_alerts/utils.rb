@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SafetyAlerts
   module Utils
     def self.hashify(obj)
