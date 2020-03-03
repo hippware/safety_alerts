@@ -20,7 +20,7 @@ module SafetyAlerts
       RGeo::Shapefile::Reader.open("#{DATA_DIR}/#{REV}.shp") do |file|
         file.each do |record|
           db.insert_geometry(
-            id: record.attributes["STATE_ZONE"],
+            id: record.attributes['STATE_ZONE'],
             geometry: record.geometry,
             data: JSON.dump(record.attributes)
           )
@@ -39,11 +39,11 @@ module SafetyAlerts
       filename = "#{data_dir}/#{basename}"
       uri = URI("#{base_url}/#{basename}")
 
-      Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
+      Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
         request = Net::HTTP::Get.new uri
 
         http.request request do |response|
-          open filename, 'w' do |io|
+          File.open filename, 'w' do |io|
             response.read_body do |chunk|
               io.write chunk
             end

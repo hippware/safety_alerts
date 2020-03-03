@@ -20,21 +20,22 @@ module SafetyAlerts
 
       files.each do |f|
         base = Pathname.new(f).basename('.shp').to_s + '.'
-        ['shp', 'shx', 'dbf'].each do |ext|
+        %w[shp shx dbf].each do |ext|
           puts "Getting #{base + ext}"
           ftp.getbinaryfile(base + ext, '/tmp/source.' + ext)
         end
 
         RGeo::Shapefile::Reader.open('/tmp/source.shp') do |file|
           file.each do |record|
-            if record.attributes["AAC"] then
-              db.insert_geometry(
-                id: record.attributes["AAC"],
-                geometry: record.geometry,
-                data: '{}'
-              )
-              count += 1
-            end
+            next unless record.attributes['AAC']
+
+            db.insert_geometry(
+              id: record.attributes['AAC'],
+              geometry: record.geometry,
+              data: '{}'
+            )
+
+            count += 1
           end
         end
       end

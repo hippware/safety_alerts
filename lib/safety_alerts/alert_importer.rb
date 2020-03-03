@@ -6,7 +6,7 @@ module SafetyAlerts
       source = importer.upcase
 
       require "safety_alerts/alert_importer/#{source.downcase}"
-      klass = self.const_get(source)
+      klass = const_get(source)
       db = DB.new(source)
 
       db.prepare_alert_import
@@ -16,10 +16,10 @@ module SafetyAlerts
       db.delete_stale_alerts
 
       puts "Imported #{count} alerts from '#{source}'"
-    rescue => error
-      puts error
+    rescue StandardError => e
+      puts e
 
-      Honeybadger.notify(error)
+      Honeybadger.notify(e)
     ensure
       db&.close
     end

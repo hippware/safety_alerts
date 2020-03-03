@@ -10,27 +10,27 @@ module SafetyAlerts
 
       Gull::Alert.fetch.each do |alert|
         ugcs =
-          alert.geocode.ugc.split(" ").map do |code|
+          alert.geocode.ugc.split(' ').map do |code|
             code.sub(/([A-Z][A-Z])[CZ]([0-9]*)/, '\1\2')
           end
 
         geometry = db.get_geometry_union(ugcs)
 
-        if geometry
-          count += 1
-          data = Utils.hashify(alert)
-          data['geocode'] = Utils.hashify(alert.geocode)
+        next unless geometry
 
-          db.insert_alert(
-            id: alert.id,
-            expires_at: alert.expires_at,
-            title: alert.title,
-            summary: alert.summary,
-            link: alert.link,
-            geometry: geometry,
-            data: data.to_json
-          )
-        end
+        count += 1
+        data = Utils.hashify(alert)
+        data['geocode'] = Utils.hashify(alert.geocode)
+
+        db.insert_alert(
+          id: alert.id,
+          expires_at: alert.expires_at,
+          title: alert.title,
+          summary: alert.summary,
+          link: alert.link,
+          geometry: geometry,
+          data: data.to_json
+        )
       end
 
       count

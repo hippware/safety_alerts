@@ -12,10 +12,10 @@ module SafetyAlerts
       secrets = Secrets.new
 
       @conn = PG.connect(
-        :host     => ENV['WOCKY_DB_HOST'] || 'localhost',
-        :dbname   => ENV['WOCKY_DB_NAME'] || 'wocky_dev',
-        :user     => ENV['WOCKY_DB_USER'] || 'postgres',
-        :password => secrets.get_value('db-password')
+        host: ENV['WOCKY_DB_HOST'] || 'localhost',
+        user: ENV['WOCKY_DB_USER'] || 'postgres',
+        dbname: ENV['WOCKY_DB_NAME'] || 'wocky_dev',
+        password: secrets.get_value('db-password')
       )
     end
 

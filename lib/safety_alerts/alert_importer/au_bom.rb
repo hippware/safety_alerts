@@ -23,50 +23,51 @@ module SafetyAlerts
         product_type = doc.xpath('amoc/product-type/text()')
 
         # Only worry about warnings (warnings tend to be 1:1
-        # with a single "weather event" or similar
-        if product_type.to_s == 'W' then
-          expiry = doc.xpath('/amoc/expiry-time/text()')
-          root_id = doc.xpath('/amoc/identifier/text()')
+        # with a single "weather event" or similar)
+        next unless product_type.to_s == 'W'
 
-          # Each warning can contain multiple "hazards" - eg
-          # multiple different warning levels for a storm
-          # depending on the areas involved
-          hazards = doc.xpath('/amoc/hazard')
-          hazards.each do |h|
-            title = h.xpath('./headline/text()')
-            index = h.xpath('@index')
-            id = root_id.to_s + '-' + index.to_s
+        expiry = doc.xpath('/amoc/expiry-time/text()')
+        root_id = doc.xpath('/amoc/identifier/text()')
 
-            # Each hazard can cover multiple areas
-            areas = h.xpath('./area-list/area')
-            geometry = nil
-            description = []
-            areas.each do |a|
-              aac = a.xpath('@aac').to_s
-              if aac then
-                g = db.get_geometry(aac)
-                if geometry then
-                  geometry += g
-                else
-                  geometry = g
-                end
+        # Each warning can contain multiple "hazards" - eg
+        # multiple different warning levels for a storm
+        # depending on the areas involved
+        hazards = doc.xpath('/amoc/hazard')
+        hazards.each do |h|
+          title = h.xpath('./headline/text()')
+          index = h.xpath('@index')
+          id = root_id.to_s + '-' + index.to_s
+
+          # Each hazard can cover multiple areas
+          areas = h.xpath('./area-list/area')
+          geometry = nil
+          description = []
+          areas.each do |a|
+            aac = a.xpath('@aac').to_s
+            if aac
+              g = db.get_geometry(aac)
+              if geometry
+                geometry += g
+              else
+                geometry = g
               end
-              description.push(a.xpath('@description').to_s)
             end
-
-            if geometry then
-              db.insert_alert(
-                id: id,
-                expires_at: expiry,
-                title: title,
-                summary: description.join('; '),
-                link: nil,
-                geometry: geometry,
-                data: '{}'
-              )
-              count += 1
-            end
+            description.push(a.xpath('@description').to_s)
           end
+
+          next unless geometry
+
+          db.insert_alert(
+            id: id,
+            expires_at: expiry,
+            title: title,
+            summary: description.join('; '),
+            link: nil,
+            geometry: geometry,
+            data: '{}'
+          )
+
+          count += 1
         end
       end
 

@@ -10,6 +10,19 @@
 # See https://github.com/rubocop-hq/rubocop/blob/master/manual/configuration.md
 Style/FrozenStringLiteralComment:
   EnforcedStyle: always_true
+
+# We have a very specific naming convention
+# that we must use for importers
+Naming/ClassAndModuleCamelCase:
+  Exclude:
+    - 'lib/safety_alerts/alert_importer/*.rb'
+    - 'lib/safety_alerts/geometry_importer/*.rb'
+
+Style/ClassAndModuleChildren:
+  Exclude:
+    - 'lib/safety_alerts/alert_importer/*.rb'
+    - 'lib/safety_alerts/geometry_importer/*.rb'
+
 Style/HashEachMethods:
   Enabled: true
 

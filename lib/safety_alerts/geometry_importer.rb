@@ -6,7 +6,7 @@ module SafetyAlerts
       source = importer.upcase
 
       require "safety_alerts/geometry_importer/#{source.downcase}"
-      klass = self.const_get(importer.upcase)
+      klass = const_get(importer.upcase)
       db = DB.new(source)
 
       db.prepare_geometry_import
@@ -14,10 +14,10 @@ module SafetyAlerts
       count = klass.run(db)
 
       puts "Imported #{count} geometries from '#{source}'"
-    rescue => error
-      puts error
+    rescue StandardError => e
+      puts e
 
-      Honeybadger.notify(error)
+      Honeybadger.notify(e)
     ensure
       db&.close
     end
