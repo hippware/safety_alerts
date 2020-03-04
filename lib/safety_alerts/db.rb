@@ -3,6 +3,7 @@
 require 'pg'
 
 module SafetyAlerts
+  # Manages the database connection for the alerts and geometries tables.
   class DB
     attr_reader :source, :conn
 

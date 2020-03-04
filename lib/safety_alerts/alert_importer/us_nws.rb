@@ -4,6 +4,7 @@ require 'gull'
 require 'json'
 
 module SafetyAlerts
+  # Alert importer for the US National Weather Service.
   module AlertImporter::US_NWS
     def self.run(db)
       Gull::Alert.fetch.reduce(0) do |count, alert|

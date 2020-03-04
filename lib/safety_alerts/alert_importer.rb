@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module SafetyAlerts
+  # This is the namespace for alert importers, and provides the main
+  # function that dynamically loads and executes alert importers.
   module AlertImporter
     def self.run(importer)
       source = importer.upcase

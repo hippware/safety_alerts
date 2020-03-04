@@ -7,6 +7,7 @@ require 'rgeo/geo_json'
 require 'rgeo/shapefile'
 
 module SafetyAlerts
+  # Alert importer for the Australian Bureau of Meteorology.
   module AlertImporter::AU_BOM
     def self.run(db)
       # Grab all the amoc.xml files from the forecasts/warnings/observations

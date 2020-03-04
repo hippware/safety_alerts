@@ -5,6 +5,7 @@ require 'net/http'
 require 'rgeo/shapefile'
 
 module SafetyAlerts
+  # Geometry importer for the US National Weather Service.
   module GeometryImporter::US_NWS
     DATA_DIR = '/tmp/US_NWS_geometry'
     BASE_URL = 'https://www.weather.gov/source/gis/Shapefiles/WSOM'

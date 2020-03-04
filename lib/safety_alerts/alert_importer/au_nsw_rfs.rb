@@ -5,6 +5,7 @@ require 'net/http'
 require 'rgeo/geo_json'
 
 module SafetyAlerts
+  # Alert importer for the New South Wales Rural Fire Service in Australia.
   module AlertImporter::AU_NSW_RFS
     def self.run(db)
       response =

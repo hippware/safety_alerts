@@ -9,6 +9,7 @@ require 'rgeo/shapefile'
 require 'tempfile'
 
 module SafetyAlerts
+  # Geometry importer for the Australian Bureau of Meteorology.
   module GeometryImporter::AU_BOM
     def self.run(db)
       ftp = Net::FTP.new('ftp.bom.gov.au')

@@ -3,6 +3,8 @@
 require 'vault'
 
 module SafetyAlerts
+  # Simple class to manage access to sensitive strings such as passwords.
+  # The current implementation relies on an external Vault service.
   class Secrets
     attr_reader :prefix
 

@@ -8,6 +8,7 @@ require 'safety_alerts/geometry_importer'
 require 'safety_alerts/secrets'
 require 'safety_alerts/utils'
 
+# This is the top-level namespace and entrypoint to the application.
 module SafetyAlerts
   def self.run_alert_import(importer)
     AlertImporter.run(importer)
