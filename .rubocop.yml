@@ -10,6 +10,7 @@
 # See https://github.com/rubocop-hq/rubocop/blob/master/manual/configuration.md
 require:
   - rubocop-performance
+  - rubocop-rspec
 
 Style/FrozenStringLiteralComment:
   EnforcedStyle: always_true
@@ -34,6 +35,10 @@ Style/ClassAndModuleChildren:
   Exclude:
     - 'lib/safety_alerts/alert_importer/*.rb'
     - 'lib/safety_alerts/geometry_importer/*.rb'
+
+Style/Documentation:
+  Exclude:
+    - 'spec/**/*'
 
 Style/HashEachMethods:
   Enabled: true
