@@ -17,12 +17,12 @@ module SafetyAlerts
       ftp.chdir('anon/gen/fwo')
 
       ftp.nlst('*.amoc.xml').reduce(0) do |count, f|
-        import_file(ftp, db, f, count)
+        data = ftp.getbinaryfile(f, nil)
+        import_file(db, data, count)
       end
     end
 
-    def self.import_file(ftp, db, file, count)
-      data = ftp.getbinaryfile(file, nil)
+    def self.import_file(db, data, count)
       doc = Nokogiri::XML(data)
       product_type = doc.xpath('amoc/product-type/text()')
 
