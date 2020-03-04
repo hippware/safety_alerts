@@ -10,6 +10,7 @@ gem 'rgeo'
 gem 'rgeo-geojson'
 gem 'rgeo-shapefile'
 gem 'rspec'
+gem 'rss'
 gem 'rubocop', require: false
 gem 'rubocop-performance', require: false
 gem 'rubocop-rspec', require: false
