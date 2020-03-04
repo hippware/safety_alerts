@@ -11,6 +11,9 @@
 Style/FrozenStringLiteralComment:
   EnforcedStyle: always_true
 
+Metrics/MethodLength:
+  Max: 25
+
 # We have a very specific naming convention
 # that we must use for importers
 Naming/ClassAndModuleCamelCase:

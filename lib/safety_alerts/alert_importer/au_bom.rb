@@ -9,69 +9,73 @@ require 'rgeo/shapefile'
 module SafetyAlerts
   module AlertImporter::AU_BOM
     def self.run(db)
-      count = 0
-
       # Grab all the amoc.xml files from the forecasts/warnings/observations
       # directory
       ftp = Net::FTP.new('ftp.bom.gov.au')
       ftp.login
       ftp.chdir('anon/gen/fwo')
-      files = ftp.nlst('*.amoc.xml')
-      files.each do |f|
-        data = ftp.getbinaryfile(f, nil)
-        doc = Nokogiri::XML(data)
-        product_type = doc.xpath('amoc/product-type/text()')
 
-        # Only worry about warnings (warnings tend to be 1:1
-        # with a single "weather event" or similar)
-        next unless product_type.to_s == 'W'
+      ftp.nlst('*.amoc.xml').reduce(0) do |count, f|
+        import_file(ftp, db, f, count)
+      end
+    end
 
-        expiry = doc.xpath('/amoc/expiry-time/text()')
-        root_id = doc.xpath('/amoc/identifier/text()')
+    def self.import_file(ftp, db, file, count)
+      data = ftp.getbinaryfile(file, nil)
+      doc = Nokogiri::XML(data)
+      product_type = doc.xpath('amoc/product-type/text()')
 
-        # Each warning can contain multiple "hazards" - eg
-        # multiple different warning levels for a storm
-        # depending on the areas involved
-        hazards = doc.xpath('/amoc/hazard')
-        hazards.each do |h|
-          title = h.xpath('./headline/text()')
-          index = h.xpath('@index')
-          id = root_id.to_s + '-' + index.to_s
+      # Only worry about warnings (warnings tend to be 1:1
+      # with a single "weather event" or similar)
+      return count unless product_type.to_s == 'W'
 
-          # Each hazard can cover multiple areas
-          areas = h.xpath('./area-list/area')
-          geometry = nil
-          description = []
-          areas.each do |a|
-            aac = a.xpath('@aac').to_s
-            if aac
-              g = db.get_geometry(aac)
-              if geometry
-                geometry += g
-              else
-                geometry = g
-              end
-            end
-            description.push(a.xpath('@description').to_s)
-          end
+      expiry = doc.xpath('/amoc/expiry-time/text()')
+      root_id = doc.xpath('/amoc/identifier/text()').to_s
 
-          next unless geometry
+      # Each warning can contain multiple "hazards" - eg
+      # multiple different warning levels for a storm
+      # depending on the areas involved
+      doc.xpath('/amoc/hazard').reduce(count) do |c, h|
+        import_hazard(db, root_id, expiry, h, c)
+      end
+    end
 
-          db.insert_alert(
-            id: id,
-            expires_at: expiry,
-            title: title,
-            summary: description.join('; '),
-            link: nil,
-            geometry: geometry,
-            data: '{}'
-          )
+    def self.import_hazard(db, root_id, expiry, hazard, count)
+      # Each hazard can cover multiple areas
+      geometry, description =
+        hazard.xpath('./area-list/area').reduce([nil, []]) do |m, a|
+          parse_area(db, a, m.first, m.last)
+        end
 
-          count += 1
+      return count unless geometry
+
+      index = hazard.xpath('@index').to_s
+
+      db.insert_alert(
+        id: "#{root_id}-#{index}",
+        expires_at: expiry,
+        title: hazard.xpath('./headline/text()'),
+        summary: description.join('; '),
+        link: nil,
+        geometry: geometry,
+        data: '{}'
+      )
+
+      count + 1
+    end
+
+    def self.parse_area(db, area, geometry, description)
+      aac = area.xpath('@aac').to_s
+      if aac
+        g = db.get_geometry(aac)
+        if geometry
+          geometry += g
+        else
+          geometry = g
         end
       end
 
-      count
+      [geometry, description.push(area.xpath('@description').to_s)]
     end
   end
 end
