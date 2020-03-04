@@ -9,6 +9,7 @@ module SafetyAlerts
     attr_reader :prefix
 
     def initialize
+      @client = nil
       @prefix = ENV['WOCKY_VAULT_PREFIX']
 
       return unless @prefix
