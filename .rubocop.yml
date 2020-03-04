@@ -36,6 +36,13 @@ Style/ClassAndModuleChildren:
     - 'lib/safety_alerts/alert_importer/*.rb'
     - 'lib/safety_alerts/geometry_importer/*.rb'
 
+RSpec/FilePath:
+  IgnoreMethods: true
+  CustomTransform:
+    US_NWS: us_nws
+    AU_BOM: au_bom
+    AU_NSW_RFS: au_nsw_rfs
+
 Style/Documentation:
   Exclude:
     - 'spec/**/*'
@@ -48,3 +55,6 @@ Style/HashTransformKeys:
 
 Style/HashTransformValues:
   Enabled: true
+
+RSpec/EmptyExampleGroup:
+  Enabled: false
