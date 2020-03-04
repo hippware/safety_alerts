@@ -11,6 +11,12 @@
 Style/FrozenStringLiteralComment:
   EnforcedStyle: always_true
 
+Metrics/ParameterLists:
+  CountKeywordArgs: false
+
+Layout/LineLength:
+  Max: 82
+
 Metrics/MethodLength:
   Max: 25
 
