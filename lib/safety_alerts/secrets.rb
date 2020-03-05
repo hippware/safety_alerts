@@ -22,9 +22,9 @@ module SafetyAlerts
     end
 
     def self.get_value(key)
-      return '' unless @prefix
+      return unless @prefix
 
-      Vault.logical.read("#{@prefix}#{key}").data[:value] || ''
+      Vault.logical.read("#{@prefix}#{key}").data[:value]
     end
   end
 end

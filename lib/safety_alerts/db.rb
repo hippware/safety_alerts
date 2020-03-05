@@ -14,7 +14,7 @@ module SafetyAlerts
         host: ENV['WOCKY_DB_HOST'] || 'localhost',
         user: ENV['WOCKY_DB_USER'] || 'postgres',
         dbname: ENV['WOCKY_DB_NAME'] || 'wocky_dev',
-        password: Secrets.get_value('db-password')
+        password: Secrets.get_value('db-password') || ''
       )
     end
 
