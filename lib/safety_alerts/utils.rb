@@ -8,10 +8,5 @@ module SafetyAlerts
         hash[var.to_s.delete('@')] = obj.instance_variable_get(var)
       end
     end
-
-    def self.print_exception(error)
-      puts error
-      print error.backtrace.join("\n")
-    end
   end
 end

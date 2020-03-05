@@ -15,9 +15,9 @@ module SafetyAlerts
 
       count = klass.run(db)
 
-      puts "Imported #{count} geometries from '#{source}'"
+      Logger.info { "Imported #{count} geometries from '#{source}'" }
     rescue StandardError => e
-      Utils.print_exception(e)
+      Logger.fatal(e)
       Honeybadger.notify(e)
     ensure
       db&.close

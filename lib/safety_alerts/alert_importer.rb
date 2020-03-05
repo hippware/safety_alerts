@@ -17,9 +17,9 @@ module SafetyAlerts
 
       db.delete_stale_alerts
 
-      puts "Imported #{count} alerts from '#{source}'"
+      Logger.info { "Imported #{count} alerts from '#{source}'" }
     rescue StandardError => e
-      Utils.print_exception(e)
+      Logger.fatal(e)
       Honeybadger.notify(e)
     ensure
       db&.close

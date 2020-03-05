@@ -5,12 +5,18 @@ require 'honeybadger/ruby'
 require 'safety_alerts/db'
 require 'safety_alerts/alert_importer'
 require 'safety_alerts/geometry_importer'
+require 'safety_alerts/logger'
 require 'safety_alerts/secrets'
 require 'safety_alerts/utils'
 
 # This is the top-level namespace and entrypoint to the application.
 module SafetyAlerts
   Secrets.configure
+
+  Logger.configure do |config|
+    config.level = :info
+    config.progname = 'safety_alerts'
+  end
 
   Honeybadger.configure do |config|
     config.logging.path = 'STDOUT'
