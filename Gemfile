@@ -2,6 +2,7 @@
 
 source 'https://rubygems.org'
 
+gem 'aws-sdk-core'
 gem 'gull'
 gem 'honeybadger'
 gem 'pg'

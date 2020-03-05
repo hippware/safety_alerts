@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'aws-sdk-core'
 require 'vault'
 
 module SafetyAlerts
@@ -8,24 +9,20 @@ module SafetyAlerts
   class Secrets
     attr_reader :prefix
 
-    def initialize
-      @client = nil
-      @prefix = ENV['WOCKY_VAULT_PREFIX']
+    @prefix = ENV['WOCKY_VAULT_PREFIX']
 
-      return unless @prefix
-
-      signature = `curl http://169.254.169.254/latest/dynamic/instance-identity/pkcs7`
-      iam_role = `curl http://169.254.169.254/latest/meta-data/iam/security-credentials/`
-      token = Vault.auth.aws_ec2(iam_role, signature, nil)
-
-      @client = Vault::Client.new(
-        address: 'http://vault-vault.vault:8200',
-        token: token.auth.client_token
-      )
+    Vault.configure do |config|
+      config.address = 'http://vault-vault.vault:8200'
     end
 
-    def get_value(key)
-      @client&.read("#{@prefix}/#{key}") || ''
+    iam_role = `curl http://169.254.169.254/latest/meta-data/iam/security-credentials/`
+
+    Vault.auth.aws_iam(iam_role, Aws::InstanceProfileCredentials.new)
+
+    def self.get_value(key)
+      return unless @prefix
+
+      Vault.logical.read("#{@prefix}#{key}").data[:value] || ''
     end
   end
 end
