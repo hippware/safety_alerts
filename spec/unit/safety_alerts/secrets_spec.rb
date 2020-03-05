@@ -6,9 +6,7 @@ RSpec.describe SafetyAlerts::Secrets do
   context 'when in development' do
     describe '#get_value' do
       it 'returns an empty string' do
-        secrets = described_class.new
-
-        expect(secrets.get_value('password')).to eq('')
+        expect(described_class.get_value('password')).to eq('')
       end
     end
   end
