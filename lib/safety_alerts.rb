@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'honeybadger'
+require 'honeybadger/ruby'
 
 require 'safety_alerts/db'
 require 'safety_alerts/alert_importer'
@@ -13,7 +13,10 @@ module SafetyAlerts
   Secrets.configure
 
   Honeybadger.configure do |config|
-    config.api_key = Secrets.get_value('honeybadger-api-key')
+    config.logging.path = 'STDOUT'
+    config.logging.level = 'WARN'
+    config.api_key = Secrets.get_value('honeybadger-api-key') || 'no-key'
+    config.env = ENV['HONEYBADGER_ENV'] || 'development'
   end
 
   def self.run_alert_import(importer)
