@@ -10,13 +10,11 @@ module SafetyAlerts
     def initialize(source)
       @source = source
 
-      secrets = Secrets.new
-
       @conn = PG.connect(
         host: ENV['WOCKY_DB_HOST'] || 'localhost',
         user: ENV['WOCKY_DB_USER'] || 'postgres',
         dbname: ENV['WOCKY_DB_NAME'] || 'wocky_dev',
-        password: secrets.get_value('db-password')
+        password: Secrets.get_value('db-password')
       )
     end
 

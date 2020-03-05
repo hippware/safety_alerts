@@ -1,5 +1,8 @@
-#!/usr/bin/env -S ruby -I lib
+#!/usr/local/bin/ruby -I lib
 # frozen_string_literal: true
+
+# We hardcode the location of ruby, above, because 'env' in alpine's busybox
+# doesn't support -S (which is required to have the "-I lib" parameters).
 
 require 'safety_alerts'
 

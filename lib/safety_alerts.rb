@@ -10,6 +10,12 @@ require 'safety_alerts/utils'
 
 # This is the top-level namespace and entrypoint to the application.
 module SafetyAlerts
+  Secrets.configure
+
+  Honeybadger.configure do |config|
+    config.api_key = Secrets.get_value('honeybadger-api-key')
+  end
+
   def self.run_alert_import(importer)
     AlertImporter.run(importer)
   end
