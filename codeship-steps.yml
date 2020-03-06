@@ -1,6 +1,6 @@
 - name: ci
   service: alerts
-  command: ci
+  command: ./ci
 - name: push_image
   tag: master
   service: alerts
