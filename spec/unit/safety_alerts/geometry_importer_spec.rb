@@ -6,11 +6,10 @@ require 'safety_alerts/geometry_importer/us_nws'
 RSpec.describe SafetyAlerts::GeometryImporter, '#run' do
   it 'loads the right module and calls #run' do
     allow(SafetyAlerts::GeometryImporter::US_NWS)
-      .to receive(:run)
-      .and_return(1)
-      .once
+      .to receive(:run).and_return(1).once
 
-    described_class.run('us_nws')
+    expect { described_class.run('us_nws') }
+      .to output(/1 geometries from 'US_NWS'/).to_stdout_from_any_process
   end
 
   it 'raises an error with bad importer name' do
