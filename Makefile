@@ -25,3 +25,7 @@ rebuild: clean build ## Rebuild the Docker image
 release: build ## Rebuild and release the Docker image to Docker Hub
 	docker push $(IMAGE_NAME):$(VERSION)
 	docker push $(IMAGE_NAME):latest
+
+ci:
+	@rubocop
+	@rspec

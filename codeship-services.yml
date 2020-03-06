@@ -1,4 +1,4 @@
-test-with-db:
+alerts:
   build:
     context: .
     dockerfile: Dockerfile
