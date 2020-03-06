@@ -1,0 +1,21 @@
+- name: ci
+  service: test-with-db
+  command: mix ci
+- name: push_image
+  tag: master
+  type: serial
+  steps:
+  - name: push_latest_image
+    service: wocky-db-watcher-rel
+    type: push
+    image_tag: latest
+    image_name: 773488857071.dkr.ecr.us-west-2.amazonaws.com/hippware/safety_alerts
+    registry: https://773488857071.dkr.ecr.us-west-2.amazonaws.com
+    dockercfg_service: aws-dockercfg
+  - name: push_tagged_image
+    service: wocky-db-watcher-rel
+    type: push
+    image_tag: "{{.CommitID}}"
+    image_name: 773488857071.dkr.ecr.us-west-2.amazonaws.com/hippware/safety_alerts
+    registry: https://773488857071.dkr.ecr.us-west-2.amazonaws.com
+    dockercfg_service: aws-dockercfg

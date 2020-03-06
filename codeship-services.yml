@@ -1,0 +1,25 @@
+test-with-db:
+  build:
+    context: .
+    dockerfile: Dockerfile
+    image: 773488857071.dkr.ecr.us-west-2.amazonaws.com/hippware/safety_alerts:latest
+  cached: true
+  environment:
+    WOCKY_DB_HOST: "postgres"
+    WOCKY_DB_NAME: "wocky_test"
+    WOCKY_DB_USER: "postgres"
+    WOCKY_DB_PASSWORD: "password"
+  depends_on:
+    - postgres
+postgres:
+  image: healthcheck/postgres:alpine
+  environment:
+    POSTGRES_DB: "wocky_test"
+    POSTGRES_USER: "postgres"
+    POSTGRES_PASSWORD: "password"
+  ports:
+    - "5432"
+aws-dockercfg:
+  image: codeship/aws-ecr-dockercfg-generator
+  add_docker: true
+  encrypted_env_file: aws.env.encrypted
