@@ -3,7 +3,7 @@
   command: make ci
 - name: push_image
   tag: master
-  service: wocky-db-watcher-rel
+  service: alerts
   type: push
   image_tag: latest
   image_name: 773488857071.dkr.ecr.us-west-2.amazonaws.com/hippware/safety_alerts
