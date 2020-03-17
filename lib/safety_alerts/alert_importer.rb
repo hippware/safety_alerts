@@ -21,8 +21,6 @@ module SafetyAlerts
     rescue StandardError => e
       Logger.fatal(e)
       Honeybadger.notify(e)
-    ensure
-      db&.close
     end
   end
 end

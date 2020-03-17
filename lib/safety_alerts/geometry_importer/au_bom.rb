@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require 'json'
 require 'net/ftp'
 require 'nokogiri'
 require 'pathname'
-require 'rgeo/geo_json'
 require 'rgeo/shapefile'
 require 'tempfile'
 
@@ -40,7 +38,7 @@ module SafetyAlerts
       db.insert_geometry(
         id: record.attributes['AAC'],
         geometry: record.geometry,
-        data: JSON.dump(record.attributes)
+        data: record.attributes
       )
 
       true

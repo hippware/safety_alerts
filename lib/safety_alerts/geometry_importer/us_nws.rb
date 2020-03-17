@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'json'
 require 'net/http'
 require 'rgeo/shapefile'
 
@@ -12,6 +11,7 @@ module SafetyAlerts
     REV = 'z_03mr20'
 
     def self.run(db)
+      FileUtils.rm_rf(DATA_DIR)
       FileUtils.mkdir(DATA_DIR)
       filename = download(DATA_DIR, BASE_URL, REV)
 
@@ -23,14 +23,12 @@ module SafetyAlerts
           db.insert_geometry(
             id: record.attributes['STATE_ZONE'],
             geometry: record.geometry,
-            data: JSON.dump(record.attributes)
+            data: record.attributes
           )
 
           count += 1
         end
       end
-
-      FileUtils.rm_rf(DATA_DIR)
 
       count
     end

@@ -3,6 +3,7 @@
 source 'https://rubygems.org'
 
 gem 'aws-sdk-core'
+gem 'faraday'
 gem 'gull'
 gem 'honeybadger'
 gem 'pg'
