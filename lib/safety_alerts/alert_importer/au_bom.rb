@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# See http://www.bom.gov.au/schema/doc/AMOC_V1.pdf for details on
+# geo designations etc
+
 require 'json'
 require 'net/ftp'
 require 'nokogiri'
@@ -67,7 +70,10 @@ module SafetyAlerts
 
     def self.parse_area(db, area, geometry, description)
       aac = area.xpath('@aac').to_s
-      if aac
+
+      # Zones with _SP in them don't have a geometry - they're spot or statewide
+      # alerts. Ignore them for now.
+      if aac && (aac !~ /.*_SP.*/)
         g = db.get_geometry(aac)
         if geometry
           geometry += g
