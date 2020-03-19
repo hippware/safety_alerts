@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'open-uri'
 require 'net/http'
 require 'rgeo/geo_json'
 
@@ -9,12 +10,12 @@ module SafetyAlerts
   module AlertImporter::US_USGS
     def self.run(db)
       response =
-        Net::HTTP.get('www.rfs.nsw.gov.au', '/feeds/majorIncidents.json')
+          URI.open('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_day.geojson').read()
 
       collection = RGeo::GeoJSON.decode(response)
 
       collection.each do |f|
-        description = "#{f.property('title')} at TIME"
+          description = "#{f.property('title')} at #{f.property('time')}"
 
         db.insert_alert(
           id: f.feature_id,

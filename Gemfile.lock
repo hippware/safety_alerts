@@ -72,7 +72,6 @@ PLATFORMS
 
 DEPENDENCIES
   aws-sdk-core
-  dbf
   gull
   honeybadger
   pg
