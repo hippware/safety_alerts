@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'faraday'
 require 'json'
 require 'rgeo/geo_json'
+require 'typhoeus'
 
 module SafetyAlerts
   # Abstracts the backend web service in Wocky.
@@ -24,10 +24,17 @@ module SafetyAlerts
         port = 443
       end
 
-      @conn = Faraday.new(
-        url: "#{scheme}://#{host}:#{port}/#{URL_BASE_PATH}/",
-        headers: { 'Content-Type' => 'application/json' }
-      )
+      @hydra = Typhoeus::Hydra.new(max_concurrency: 20)
+      @base_url = "#{scheme}://#{host}:#{port}/#{URL_BASE_PATH}/"
+      @headers = { 'Content-Type' => 'application/json' }
+      @count = 20
+
+      # @hydra.run
+
+      # @conn = Faraday.new(
+      #   url: "#{scheme}://#{host}:#{port}/#{URL_BASE_PATH}/",
+      #   headers: { 'Content-Type' => 'application/json' }
+      # )
     end
 
     def prepare_alert_import
@@ -61,17 +68,33 @@ module SafetyAlerts
     end
 
     def insert_geometry(id:, geometry:, data:)
+      # puts "Importing geometry for #{@source}/#{id}"
+
       packet = {
         id: id,
         data: data,
         geometry: RGeo::GeoJSON.encode(geometry)
       }
 
-      resp = @conn.put("geometries/#{@source}/#{id}") do |req|
-        req.body = packet.to_json
-      end
+      # @hydra.queue
+      Typhoeus::Request.new(
+        "#{@base_url}/geometries/#{@source}/#{id}",
+        method: :put,
+        body: packet.to_json,
+        headers: @headers
+      ).run
 
-      resp.status == 201
+      # @count += 1
+      # if @count >= 20
+      #   @count = 0
+      #   @hydra.run
+      # end
+
+      # resp = @conn.put("geometries/#{@source}/#{id}") do |req|
+      #   req.body = packet.to_json
+      # end
+
+      # resp.status == 201
     end
   end
 end
